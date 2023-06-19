@@ -1,0 +1,5 @@
+/start -> "Can we start?" Question -> "You can tie, but you can't untie. What is this?" I know -> 'You are the first person, who knows it!''It is conversation. '
+'Do you know if a vampire bites a zombie, does the zombie become a vampire or does the vampire become a zombie?''Of course you do not know, because it is one of the question, that have not answers.'
+/start ->"Can we start?" Question -> "You can tie, but you can't untie. What is this?" I have not ideas -> 'It is bad'
+/start -> "Can we start?" I am not sure -> "Why??? You should to shine! Do not worry and have a try!" -> 'I belive in you'
+/start -> "Can we start?" I am not sure -> "If you does not want you can just walk away" -> 'See you later'
