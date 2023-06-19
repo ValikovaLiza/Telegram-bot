@@ -1,0 +1,84 @@
+import telebot
+import random
+import time
+
+from telebot import types
+ 
+bot = telebot.TeleBot(os.getenv('bot'))
+ 
+@bot.message_handler(commands=['start'])
+def welcome(message):
+ 
+    # keyboard
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Question")
+    item2 = types.KeyboardButton("I am not sure")
+ 
+    markup.add(item1, item2)
+ 
+    bot.send_message(message.chat.id, "Can we start?".format(message.from_user, bot.get_me()),
+        parse_mode='html', reply_markup=markup)
+ 
+@bot.message_handler(content_types=['text'])
+def lalala(message):
+    if message.chat.type == 'private':
+        if message.text == 'Question':
+
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item3 = types.InlineKeyboardButton("I know!", callback_data='i know')
+            item4 = types.InlineKeyboardButton("I have not any ideas", callback_data='no ideas')
+            markup.add(item3, item4)
+
+            bot.send_message(message.chat.id, "You can tie, but you can't untie. What is this?", reply_markup=markup)
+
+        elif message.text == 'I am not sure':
+ 
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton("Why??? You should to shine! Do not worry and have a try!", callback_data='good')
+            item2 = types.InlineKeyboardButton("If you does not want you can just walk away", callback_data='bad')
+ 
+            markup.add(item1, item2)
+ 
+            bot.send_message(message.chat.id, 'You do not want?!', reply_markup=markup)
+ 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    try:
+        if call.message:
+            if call.data == 'good':
+                bot.send_message(call.message.chat.id, 'I belive in you')
+            elif call.data == 'bad':
+                bot.send_message(call.message.chat.id, 'See you later')
+ 
+            # remove inline buttons
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="I am not sure",
+                reply_markup=None)
+ 
+            # show alert
+            bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
+                text="LETTER")
+        if call.message:
+            if call.data == 'i know':
+                bot.send_message(call.message.chat.id, 'You are the first person, who knows it!')
+                bot.send_message(call.message.chat.id, 'It is conversation. ')
+                time.sleep(5)
+                bot.send_message(call.message.chat.id, 'Do you know if a vampire bites a zombie, does the zombie become a vampire or does the vampire become a zombie?')
+                time.sleep(7)
+                bot.send_message(call.message.chat.id, 'Of course you do not know, because it is one of the question, that have not answers.')
+
+
+                if call.data == 'no ideas':
+                    bot.send_message(call.message.chat.id, 'It is bad')
+ 
+            # remove inline buttons
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Mmm...",
+                reply_markup=None)
+ 
+            # show alert
+            bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
+                text="LETTER")
+    except Exception as e:
+        print(repr(e))
+
+# RUN
+bot.polling(none_stop=True)
