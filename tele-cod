@@ -7,7 +7,7 @@ import requests
 from telebot import types
  
 bot = telebot.TeleBot(os.getenv('bot'))
- 
+  
 @bot.message_handler(commands=['start'])
 def welcome(message):
  
@@ -15,8 +15,9 @@ def welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton("Question")
     item2 = types.KeyboardButton("I am not sure")
+    item3 = types.KeyboardButton("Fact")
  
-    markup.add(item1, item2)
+    markup.add(item1, item2, item3)
  
     bot.send_message(message.chat.id, "Can we start?".format(message.from_user, bot.get_me()),
         parse_mode='html', reply_markup=markup)
@@ -42,6 +43,15 @@ def lalala(message):
             markup.add(item1, item2)
  
             bot.send_message(message.chat.id, 'You do not want?!', reply_markup=markup)
+        elif message.text == 'Fact':
+ 
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton("What about cats? :)", callback_data='cat')
+            item2 = types.InlineKeyboardButton("Strange fact", callback_data='strange')
+ 
+            markup.add(item1, item2)
+ 
+            bot.send_message(message.chat.id, 'You do not want?!', reply_markup=markup)
  
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
@@ -56,9 +66,24 @@ def callback_inline(call):
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="I am not sure",
                 reply_markup=None)
  
+
             # show alert
             bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
                 text="LETTER")
+            if call.data == 'cat':
+                bot.send_message(call.message.chat.id, requests.get("https://catfact.ninja/fact"))
+            elif call.data == 'strange':
+                bot.send_message(call.message.chat.id, 'Junghook is afraid of microwaves.')
+ 
+            # remove inline buttons
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Mmm...",
+                reply_markup=None)
+ 
+            # show alert
+            bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
+                text="LETTER")
+
+
         if call.message:
             if call.data == 'i know':
                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Mmm...",
@@ -69,8 +94,7 @@ def callback_inline(call):
                 bot.send_message(call.message.chat.id, 'Do you know if a vampire bites a zombie, does the zombie become a vampire or does the vampire become a zombie?')
                 time.sleep(7)
                 bot.send_message(call.message.chat.id, 'Of course you do not know, because it is one of the question, that have not answers.')
-                time.sleep(7)
-                bot.send_message(call.message.chat.id, requests.get("https://catfact.ninja/fact"))
+                
                 
 
 
